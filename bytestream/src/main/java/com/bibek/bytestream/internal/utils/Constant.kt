@@ -20,4 +20,26 @@ object Constant {
     const val DOWNLOAD_REQUEST_KEY = "key_download_request"
     const val NOTIFICATION_CONFIG_KEY = "key_notification_config"
     const val ETAG_HEADER_KEY = "ETag"
+
+
+    const val DOWNLOAD_NOTIFICATION_CHANNEL_ID = "download_channel"
+    const val NOTIFICATION_CHANNEL_NAME_KEY = "notification_channel_name_key"
+    const val DEFAULT_NOTIFICATION_CHANNEL_NAME = "Download Progress"
+    const val NOTIFICATION_CHANNEL_DESCRIPTION_KEY = "notification_channel_description_key"
+    const val DEFAULT_NOTIFICATION_CHANNEL_DESCRIPTION = "Notification for file download status"
+    const val NOTIFICATION_CHANNEL_IMPORTANCE_KEY = "notification_channel_importance_key"
+    const val DEFAULT_NOTIFICATION_CHANNEL_IMPORTANCE = 2 // LOW
+    const val SMALL_NOTIFICATION_ICON_KEY = "small_notification_icon_key"
+    const val DEFAULT_SMALL_NOTIFICATION_ICON = -1
+    const val NOTIFICATION_ID_KEY = "notification_id_key"
+
+    // Cancel
+    const val CANCEL_BUTTON_LABEL = "Cancel"
+    const val PAUSE_BUTTON_LABEL = "Pause"
+    const val RESUME_BUTTON_LABEL = "Resume"
+    const val RETRY_BUTTON_LABEL = "Retry"
+
+    const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_NAME = "File Download"
+    const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_DESCRIPTION = "Notify file download status"
+    const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_IMPORTANCE = 2 // LOW
 }
