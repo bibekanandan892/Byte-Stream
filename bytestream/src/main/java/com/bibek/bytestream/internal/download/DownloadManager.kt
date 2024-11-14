@@ -124,7 +124,7 @@ internal class DownloadManager(
         return downloadDao.getAllDownload().find { it.uuid == uuid.toString() }
     }
 
-    fun DownloadEntity.isInProgress(): Boolean {
+    private fun DownloadEntity.isInProgress(): Boolean {
         return currentStatus == Status.IN_PROGRESS
     }
 
@@ -216,15 +216,23 @@ internal class DownloadManager(
         return downloadDao.getAllDownload().find { it.uuid == uuid.toString() }
     }
 
-    fun downloadAsync(fileDownloadRequest: FileDownloadRequest) =
-        launch { download(fileDownloadRequest) }
+    fun downloadAsync(fileDownloadRequest: FileDownloadRequest) =launch {
+        download(fileDownloadRequest)
+    }
 
-    fun resumeAsync(id: Int) = launch { updateUserAction(id = id, action = Action.RESUME) }
-    fun resumeAsync(tag: String) =
-        launch { performActionOnAllWithTag(tag = tag) { resumeAsync(it) } }
+    fun resumeAsync(id: Int) = launch {
+        updateUserAction(id = id, action = Action.RESUME)
+    }
+    fun resumeAsync(tag: String) = launch {
+        performActionOnAllWithTag(tag = tag) { resumeAsync(it) }
+    }
 
-    fun cancelAsync(id: Int) = launch { updateUserAction(id = id, action = Action.CANCEL) }
-    fun cancelAsync(tag: String) = launch { performActionOnAllWithTag(tag) { cancelAsync(it) } }
+    fun cancelAsync(id: Int) = launch {
+        updateUserAction(id = id, action = Action.CANCEL)
+    }
+    fun cancelAsync(tag: String) = launch {
+        performActionOnAllWithTag(tag) { cancelAsync(it) }
+    }
     fun pauseAsync(id: Int) = launch {
         updateUserAction(id = id, action = Action.PAUSE)
     }
