@@ -13,11 +13,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SampleButtonLayout(
     sample1OnClick: () -> Unit,
-    sample2OnClick: () -> Unit,
-    sample3OnClick: () -> Unit,
-    sample4OnClick: () -> Unit,
-    sample5OnClick: () -> Unit,
-    sample6OnClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -36,59 +31,7 @@ fun SampleButtonLayout(
                     .weight(1f)
                     .padding(5.dp)
             ) {
-                Text("Sample 1")
-            }
-
-            Button(
-                onClick =sample2OnClick,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            ) {
-                Text("Sample 2")
-            }
-
-            Button(
-                onClick = sample3OnClick,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            ) {
-                Text("Sample 3")
-            }
-        }
-
-        // Second Row of Buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp)
-        ) {
-            Button(
-                onClick = sample4OnClick,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            ) {
-                Text("Sample 4")
-            }
-
-            Button(
-                onClick = sample5OnClick,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            ) {
-                Text("Sample 5")
-            }
-
-            Button(
-                onClick = sample6OnClick,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            ) {
-                Text("Sample 6")
+                Text("Test Download")
             }
         }
     }
