@@ -14,6 +14,10 @@
 
 Byte-Stream is a robust and customizable file downloading library for Android written entirely in Kotlin. It simplifies the file downloading process in Android applications by providing extensive support for parallel downloads, pause/resume capabilities, and fine-grained download control.
 
+<p align="center">
+  <img height="500" alt = "High level design" src=https://github.com/user-attachments/assets/c0620ee3-4672-4604-96ce-4472c3f30ad6>
+</p>
+
 ---
 
 ### Key Features of Byte-Stream
