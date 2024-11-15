@@ -28,7 +28,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bibek.bytestream.R
 import com.bibek.bytestream.internal.utils.Status
-
+/**
+ * A composable function representing a downloadable item with options to manage download actions.
+ *
+ * @param fileName The name of the file being downloaded.
+ * @param progressPercentage A string showing the percentage of the download completed.
+ * @param fileSize The size of the file.
+ * @param downloadProgress A float indicating the progress in the range [0,1].
+ * @param downloadStatus The current status of the download (e.g., Paused, Queued, Started).
+ * @param onDownloadClick A lambda function triggered when the download button is clicked.
+ * @param onCancelClick A lambda function triggered when the cancel button is clicked.
+ * @param onPauseClick A lambda function triggered when the pause button is clicked.
+ * @param onResumeClick A lambda function triggered when the resume button is clicked.
+ * @param onDeleteClick A lambda function triggered when the delete button is clicked.
+ * @param onRetryClick A lambda function triggered when the retry button is clicked.
+ * @param onFileClick A lambda function triggered when the file item itself is clicked.
+ */
 @Composable
 fun DownloadItem(
     fileName: String,

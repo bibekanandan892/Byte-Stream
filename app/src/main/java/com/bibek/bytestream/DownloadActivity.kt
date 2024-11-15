@@ -72,8 +72,7 @@ class DownloadActivity : ComponentActivity() {
                                 byteStream.download(
                                     url = "https://sample-videos.com/video321/mp4/480/big_buck_bunny_480p_20mb.mp4",
                                     path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path,
-                                    fileName = "Video${
-                                        UUID.randomUUID().toString().substring(0, 10)
+                                    fileName = "Video_${UUID.randomUUID().toString().substring(0, 10)
                                     }.mp4",
                                     tag = "Video",
                                     metaData = "158"
