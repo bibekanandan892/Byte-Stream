@@ -27,7 +27,16 @@ import com.bibek.bytestream.internal.utils.Constant.REQUEST_ID_KEY
 import com.bibek.bytestream.internal.utils.Constant.SMALL_NOTIFICATION_ICON_KEY
 import com.bibek.bytestream.internal.utils.DownloadUtil
 import com.bibek.bytestream.internal.utils.removeNotification
-
+/**
+ * Manages notifications for download tasks, including progress updates,
+ * pause, cancel, and completion actions, as well as creating and updating
+ * a notification channel for Android devices running Oreo (API 26) or higher.
+ *
+ * @property context the context used for creating notifications
+ * @property notificationConfig configuration for customizing notification behavior
+ * @property requestId unique ID for the request tied to the notification
+ * @property fileName name of the file being downloaded
+ */
 @SuppressLint("WrongConstant")
 internal class NotificationManager(
     private val context: Context,
@@ -46,7 +55,15 @@ internal class NotificationManager(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) createNotificationChannel()
         }
     }
-
+    /**
+     * Updates or sets up the notification based on the download progress and other parameters.
+     *
+     * @param progress the current progress percentage
+     * @param speedInBPerMs download speed in bytes per millisecond
+     * @param length total length of the file being downloaded
+     * @param update indicates whether this is a progress update or initial setup
+     * @return an updated [ForegroundInfo] instance, if applicable
+     */
     fun updateNotification(
         progress: Int = 0,
         speedInBPerMs: Float = 0F,
@@ -60,7 +77,11 @@ internal class NotificationManager(
         }
         return foregroundInfo
     }
-
+    /**
+     * Sets up the initial notification when a download begins.
+     *
+     * @param progress the initial progress percentage
+     */
     private fun setupInitialNotification(progress: Int) {
         removeNotification(context, requestId)
         removeNotification(context, requestId + 1)
@@ -78,7 +99,13 @@ internal class NotificationManager(
 
         foregroundInfo = createForegroundInfo()
     }
-
+    /**
+     * Updates the progress notification with new progress, speed, and length information.
+     *
+     * @param progress current progress percentage
+     * @param speedInBPerMs download speed in bytes per millisecond
+     * @param length total length of the file
+     */
     private fun updateProgressNotification(progress: Int, speedInBPerMs: Float, length: Long) {
         notificationBuilder.apply {
             setProgress(MAX_PROGRESS_VALUE, progress, false)
@@ -93,7 +120,14 @@ internal class NotificationManager(
         }
         foregroundInfo = createForegroundInfo()
     }
-
+    /**
+     * Constructs a content text for the notification based on current download metrics.
+     *
+     * @param speedInBPerMs download speed in bytes per millisecond
+     * @param progress current progress percentage
+     * @param length total length of the file
+     * @return a formatted string for the content text
+     */
     private fun setContentTextNotification(
         speedInBPerMs: Float,
         progress: Int,
@@ -113,7 +147,9 @@ internal class NotificationManager(
             if (notificationConfig.showSize) "total: $lengthText" else null
         ).joinToString()
     }
-
+    /**
+     * Creates a pending intent to open the main activity of the application.
+     */
     private fun createPendingIntent(): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
             this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -126,7 +162,9 @@ internal class NotificationManager(
             PendingIntent.FLAG_IMMUTABLE
         )
     }
-
+    /**
+     * Creates the [ForegroundInfo] object for the foreground service.
+     */
     private fun createForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(
             notificationId,
@@ -134,7 +172,9 @@ internal class NotificationManager(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
         )
     }
-
+    /**
+     * Creates a notification channel for devices running Android Oreo (API 26) or higher.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -147,7 +187,11 @@ internal class NotificationManager(
         context.getSystemService(NotificationManager::class.java)
             ?.createNotificationChannel(channel)
     }
-
+    /**
+     * Creates a pending intent for a specific notification action (e.g., pause, cancel).
+     *
+     * @param action the action for the pending intent
+     */
     private fun createNotificationActionIntent(action: String): PendingIntent {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             this.action = action
@@ -161,6 +205,7 @@ internal class NotificationManager(
             PendingIntent.FLAG_IMMUTABLE
         )
     }
+    // Functions to send broadcast notifications for different states
 
     fun sendCompletionNotification(totalLength: Int) {
         sendBroadcastNotification(DownloadState.Completed, totalLength)
@@ -185,6 +230,13 @@ internal class NotificationManager(
         )
     }
 
+    /**
+     * Sends a broadcast notification with specific download state and progress.
+     *
+     * @param downloadState the current state of the download
+     * @param progress the current progress percentage
+     * @param totalLength the total length of the file being downloaded
+     */
     private fun sendBroadcastNotification(
         downloadState: DownloadState,
         progress: Int = 0,
@@ -203,5 +255,4 @@ internal class NotificationManager(
             putExtra(PROGRESS_KEY, progress)
         })
     }
-
 }
