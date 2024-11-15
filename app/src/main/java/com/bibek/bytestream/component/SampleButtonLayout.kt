@@ -9,7 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
+/**
+ * Composable function that displays a layout containing a single button within a column.
+ *
+ * @param sample1OnClick Lambda function triggered when the "Test Download" button is clicked.
+ */
 @Composable
 fun SampleButtonLayout(
     sample1OnClick: () -> Unit,
