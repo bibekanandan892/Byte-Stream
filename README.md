@@ -160,7 +160,6 @@ Important Note: Add `FOREGROUND_SERVICE_DATA_SYNC`, `WAKE_LOCK`, and `INTERNET` 
 
 - **Multi-part download.
 - **Many bug fixes.
-- 
 ---
 
 
