@@ -43,6 +43,17 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * A manager class responsible for handling download tasks, including scheduling, pausing,
+ * resuming, and canceling downloads, as well as managing download states and observing progress.
+ *
+ * @property context The application context used for notifications and other app-level actions.
+ * @property downloadDao Data access object for interacting with the download database.
+ * @property workManager The WorkManager instance used for scheduling and tracking download tasks.
+ * @property downloadTimeout Timeout configuration for downloads.
+ * @property notificationConfig Configuration for notifications related to downloads.
+ * @property logger Logger instance for logging events and errors.
+ */
 internal class DownloadManager(
     private val context: Context,
     private val downloadDao: DownloadDao,
@@ -63,6 +74,9 @@ internal class DownloadManager(
         }
     }
 
+    /**
+     * Observes the WorkManager's work info updates for download tasks and logs the states.
+     */
     private suspend fun observerWorkInfos() {
         workManager.getWorkInfosForUniqueWorkFlow(DOWNLOAD_TAG)
             .flowOn(Dispatchers.IO)
@@ -73,6 +87,11 @@ internal class DownloadManager(
             }
     }
 
+    /**
+     * Logs the details of a work request based on its state.
+     *
+     * @param workInfo The WorkInfo object representing the download task's current state.
+     */
     private suspend fun logWorkInfo(workInfo: WorkInfo) {
         val downloadEntity = getDownloadWorkEntityFromUUID(workInfo.id)
         val message = when (workInfo.state) {
@@ -86,11 +105,24 @@ internal class DownloadManager(
         message?.let { logger.log("FileName: ${downloadEntity?.fileName}, ID: ${downloadEntity?.id} - $it") }
     }
 
+    /**
+     * Retrieves a message for the canceled download task.
+     *
+     * @param downloadEntity The download entity associated with the canceled task.
+     * @return A message indicating the cancellation status.
+     */
     private fun getCancelledMessage(downloadEntity: DownloadEntity?): String {
         return if (downloadEntity?.action == Action.PAUSE) "Download Paused"
         else "Download Cancelled"
     }
 
+    /**
+     * Retrieves a message for the running download task, including the progress percentage.
+     *
+     * @param downloadEntity The download entity associated with the running task.
+     * @param workInfo The WorkInfo object representing the download task.
+     * @return A message indicating the download status.
+     */
     private fun getRunningMessage(downloadEntity: DownloadEntity?, workInfo: WorkInfo): String {
         return when (workInfo.progress.getString(STATE_KEY)) {
             STARTED_STATUS -> "Download Started"
@@ -105,6 +137,12 @@ internal class DownloadManager(
         }
     }
 
+    /**
+     * Updates an existing download entry with the new work request details.
+     *
+     * @param downloadEntity The existing download entity.
+     * @param workRequest The new work request associated with the download.
+     */
     private suspend fun updateExistingDownload(
         downloadEntity: DownloadEntity,
         workRequest: OneTimeWorkRequest
@@ -119,15 +157,30 @@ internal class DownloadManager(
         }
     }
 
-
+    /**
+     * Retrieves a download entity from the database based on the work request UUID.
+     *
+     * @param uuid The UUID of the work request.
+     * @return The corresponding DownloadEntity or null if not found.
+     */
     private suspend fun getDownloadWorkEntityFromUUID(uuid: UUID): DownloadEntity? {
         return downloadDao.getAllDownload().find { it.uuid == uuid.toString() }
     }
 
+    /**
+     * Checks whether the download entity's current status is "in progress".
+     *
+     * @return True if the download status is "in progress", false otherwise.
+     */
     private fun DownloadEntity.isInProgress(): Boolean {
         return currentStatus == Status.IN_PROGRESS
     }
 
+    /**
+     * Initiates a download task by creating a OneTimeWorkRequest and enqueuing it.
+     *
+     * @param fileDownloadRequest The request containing the details for the download task.
+     */
     private suspend fun download(fileDownloadRequest: FileDownloadRequest) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -157,7 +210,12 @@ internal class DownloadManager(
         )
     }
 
-
+    /**
+     * Inserts a new download entry into the database and schedules it for execution.
+     *
+     * @param fileDownloadRequest The request containing the details for the download task.
+     * @param workRequest The OneTimeWorkRequest created for the download task.
+     */
     private suspend fun insertNewDownload(
         fileDownloadRequest: FileDownloadRequest,
         workRequest: OneTimeWorkRequest
@@ -182,6 +240,12 @@ internal class DownloadManager(
         }
     }
 
+    /**
+     * Updates the action of a download task (e.g., pause, cancel, resume, retry).
+     *
+     * @param id The ID of the download task to update.
+     * @param action The action to perform on the task.
+     */
     private suspend fun updateUserAction(id: Int, action: String) {
         val download = downloadDao.get(id)
 
@@ -200,20 +264,31 @@ internal class DownloadManager(
                 }
             }
         }
-
-
     }
 
-
+    /**
+     * Performs a specified action on all downloads with the given tag.
+     *
+     * @param tag The tag identifying the group of downloads.
+     * @param action The action to perform on each download.
+     */
     private suspend fun performActionOnAllWithTag(tag: String, action: suspend (Int) -> Unit) {
         downloadDao.getAllEntityByTag(tag).forEach {
             action(it.id)
         }
     }
 
+    /**
+     * Retrieves a download entity from the database based on the work request UUID.
+     *
+     * @param uuid The UUID of the work request.
+     * @return The corresponding DownloadEntity or null if not found.
+     */
     private suspend fun findDownloadEntityFromUUID(uuid: UUID): DownloadEntity? {
         return downloadDao.getAllDownload().find { it.uuid == uuid.toString() }
     }
+
+    // The public methods to interact with the download manager, launching corresponding actions asynchronously.
 
     fun downloadAsync(fileDownloadRequest: FileDownloadRequest) = launch {
         download(fileDownloadRequest)
@@ -240,14 +315,23 @@ internal class DownloadManager(
     }
 
     fun pauseAsync(tag: String) = launch { performActionOnAllWithTag(tag = tag) { pauseAsync(it) } }
+
     fun retryAsync(id: Int) = launch { updateUserAction(id = id, action = Action.RETRY) }
+
     fun retryAsync(tag: String) = launch { performActionOnAllWithTag(tag = tag) { retryAsync(it) } }
+
     fun clearDbAsync(id: Int, deleteFile: Boolean) =
         launch { clearDownload(id = id, deleteFile = deleteFile) }
 
     fun clearDbAsync(tag: String, deleteFile: Boolean) =
         launch { performActionOnAllWithTag(tag) { clearDbAsync(it, deleteFile) } }
 
+    /**
+     * Clears a download task from the database, cancels its work, and optionally deletes the downloaded file.
+     *
+     * @param id The ID of the download task to clear.
+     * @param deleteFile Whether to delete the downloaded file associated with the task.
+     */
     private suspend fun clearDownload(id: Int, deleteFile: Boolean) {
         workManager.cancelUniqueWork(id.toString())
         downloadDao.get(id)?.let { downloadEntity ->
@@ -261,17 +345,33 @@ internal class DownloadManager(
     }
 
     // Observers for download progress
+
+    /**
+     * Observes the progress of a download by its ID.
+     *
+     * @param id The ID of the download task.
+     * @return A Flow that emits the download progress as a DownloadModel.
+     */
     fun observeDownloadById(id: Int) =
         downloadDao.getEntityByIdFlow(id).filterNotNull().distinctUntilChanged()
             .map { it.toDownloadModel() }
 
+    /**
+     * Observes the progress of all downloads with a specific tag.
+     *
+     * @param tag The tag identifying the group of downloads.
+     * @return A Flow that emits the list of DownloadModel representing the downloads.
+     */
     fun observeDownloadsByTag(tag: String): Flow<List<DownloadModel>> {
         return downloadDao.getAllEntityByTagFlow(tag)
             .map { it.map(DownloadEntity::toDownloadModel) }
     }
 
+    /**
+     * Observes the progress of all downloads.
+     *
+     * @return A Flow that emits the list of DownloadModel representing all downloads.
+     */
     fun observeAllDownloads(): Flow<List<DownloadModel>> = downloadDao.getAllDownloadFlow()
         .map { entityList -> entityList.map { it.toDownloadModel() } }
-
-
 }
