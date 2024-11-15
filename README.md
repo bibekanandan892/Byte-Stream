@@ -158,8 +158,8 @@ Important Note: Add `FOREGROUND_SERVICE_DATA_SYNC`, `WAKE_LOCK`, and `INTERNET` 
 
 ### TODO
 
-- **Multi-part download.
-- **Many bug fixes.
+- **Multi-part download**.
+- **Many bug fixes**.
 ---
 
 
