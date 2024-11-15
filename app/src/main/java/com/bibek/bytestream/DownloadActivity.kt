@@ -25,7 +25,10 @@ import com.bibek.bytestream.internal.utils.Status
 import com.bibek.bytestream.ui.theme.ByteStreamTheme
 import java.io.File
 import java.util.UUID
-
+/**
+ * DownloadActivity is an activity that manages file downloads and requests
+ * necessary permissions to handle file storage and notifications.
+ */
 class DownloadActivity : ComponentActivity() {
     private lateinit var byteStream: ByteStream
     override fun onCreate(savedInstanceState: Bundle?) {

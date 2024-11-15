@@ -33,7 +33,6 @@ object Constant {
     const val DEFAULT_SMALL_NOTIFICATION_ICON = -1
     const val NOTIFICATION_ID_KEY = "notification_id_key"
 
-    // Cancel
     const val CANCEL_BUTTON_LABEL = "Cancel"
     const val PAUSE_BUTTON_LABEL = "Pause"
     const val RESUME_BUTTON_LABEL = "Resume"
