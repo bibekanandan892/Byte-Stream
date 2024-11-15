@@ -156,6 +156,14 @@ Important Note: Add `FOREGROUND_SERVICE_DATA_SYNC`, `WAKE_LOCK`, and `INTERNET` 
 
 ---
 
+### TODO
+
+- **Multi-part download.
+- **Many bug fixes.
+- 
+---
+
+
 ### CREDITS
 
 - **[Ketch](https://github.com/khushpanchal/Ketch)** - The design and functionality of Byte-Stream were inspired by Ketch, which provided valuable insights into structuring efficient downloading features.
