@@ -33,8 +33,16 @@ import com.bibek.bytestream.internal.utils.Constant.RETRY_BUTTON_LABEL
 import com.bibek.bytestream.internal.utils.Constant.SMALL_NOTIFICATION_ICON_KEY
 import com.bibek.bytestream.internal.utils.DownloadUtil.getTotalLengthText
 
+/**
+ * NotificationReceiver handles various notification actions like Cancel, Pause, Resume, and Retry.
+ * This class extends BroadcastReceiver and performs specific tasks based on received intents.
+ */
 internal class NotificationReceiver : BroadcastReceiver() {
 
+    /**
+     * Handles the received broadcast intent based on its action.
+     * Supports multiple actions related to notification handling such as cancel, pause, resume, retry, and dismiss.
+     */
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?) {
         context ?: return
@@ -71,10 +79,13 @@ internal class NotificationReceiver : BroadcastReceiver() {
             }
 
             else -> handleNotificationAction(context, intent)
-
         }
     }
 
+    /**
+     * Creates and displays a notification with provided action and progress details.
+     * Configures the notification based on the state of download (e.g., completed, failed, paused).
+     */
     @SuppressLint("MissingPermission")
     private fun handleNotificationAction(context: Context, intent: Intent) {
         val requestId = intent.extras?.getInt(REQUEST_ID_KEY) ?: return
@@ -94,6 +105,8 @@ internal class NotificationReceiver : BroadcastReceiver() {
         val currentProgress = intent.getIntExtraOrDefault(PROGRESS_KEY, 0)
         val totalLength = intent.getLongExtraOrDefault(LENGTH_KEY, DEFAULT_LENGTH_VALUE)
         val notificationId = requestId + 1
+
+        // Create a notification channel for Android Oreo and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(
                 context,
@@ -129,7 +142,9 @@ internal class NotificationReceiver : BroadcastReceiver() {
         NotificationManagerCompat.from(context).notify(notificationId, notificationBuilder.build())
     }
 
-
+    /**
+     * Cancels the notification and performs the specified action.
+     */
     private fun handleAction(context: Context, intent: Intent, action: (Int) -> Unit) {
         val requestId = intent.extras?.getInt(REQUEST_ID_KEY)
         val notificationId = intent.extras?.getInt(NOTIFICATION_ID_KEY)
@@ -137,7 +152,9 @@ internal class NotificationReceiver : BroadcastReceiver() {
         requestId?.let(action)
     }
 
-
+    /**
+     * Generates the notification text based on download state and progress.
+     */
     private fun getNotificationText(action: String?, totalLength: Long, currentProgress: Int) =
         when (action) {
             DownloadState.Completed.action -> "Download successful. (${
@@ -151,6 +168,9 @@ internal class NotificationReceiver : BroadcastReceiver() {
             else -> "Download cancelled."
         }.plus(if (action == DownloadState.Paused.action || action == DownloadState.Failed.action) " $currentProgress%" else "")
 
+    /**
+     * Adds action buttons (like Retry, Cancel, Resume) to the notification based on its current state.
+     */
     private fun addActionButtons(
         context: Context,
         action: String?,
@@ -205,6 +225,9 @@ internal class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * Creates a PendingIntent for notification actions.
+     */
     private fun createPendingIntent(
         context: Context,
         notificationId: Int,
@@ -223,6 +246,9 @@ internal class NotificationReceiver : BroadcastReceiver() {
         )
     }
 
+    /**
+     * Creates a notification channel for displaying notifications on Android Oreo and above.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(
         context: Context,
@@ -237,12 +263,15 @@ internal class NotificationReceiver : BroadcastReceiver() {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
+    // Extension function to get a string extra with a default value.
     private fun Intent.getStringExtraOrDefault(key: String, defaultValue: String) =
         extras?.getString(key) ?: defaultValue
 
+    // Extension function to get an int extra with a default value.
     private fun Intent.getIntExtraOrDefault(key: String, defaultValue: Int) =
         extras?.getInt(key) ?: defaultValue
 
+    // Extension function to get a long extra with a default value.
     private fun Intent.getLongExtraOrDefault(key: String, defaultValue: Long) =
         extras?.getLong(key) ?: defaultValue
 }
