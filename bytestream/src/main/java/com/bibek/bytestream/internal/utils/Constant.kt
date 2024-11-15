@@ -41,4 +41,6 @@ object Constant {
     const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_NAME = "File Download"
     const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_DESCRIPTION = "Notify file download status"
     const val DEFAULT_VALUE_NOTIFICATION_CHANNEL_IMPORTANCE = 2 // LOW
+
+    const val DATABASE_NAME = "ByteStream Database"
 }
