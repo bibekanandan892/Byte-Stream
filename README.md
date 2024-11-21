@@ -48,7 +48,7 @@ Byte-Stream is a robust and customizable file downloading library for Android wr
 2. Add Byte-Stream dependency in your `build.gradle` file:
    ```groovy
    dependencies {
-       implementation 'com.github.bibekanandan892:Byte-Stream:1.0.0' // Replace with latest version
+       implementation 'com.github.bibekanandan892:Byte-Stream:alpha.0.0.1' // Replace with latest version
    }
    ```
 
